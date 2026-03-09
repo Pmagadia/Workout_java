@@ -1,0 +1,135 @@
+Whats Needed On Our Side - Workout_java TP03 Fixes
+===================================================
+
+Hey team, here is the full breakdown of what we need to fix/add based on professor's TP02 feedback. I went through all the code and verified each issue. Splitting this into MUST FIX items and NEW FEATURES we need to add.
+
+
+MUST FIX (Professor's Required Fixes)
+--------------------------------------
+
+1) INPUT VALIDATION - APP CRASHES ON BAD INPUT
+   File: WorkoutApp.java (lines 39, 53, 56, 59)
+   Problem: We use sc.nextInt() and sc.nextDouble() directly. If user types letters instead of numbers for menu choice, weight, reps, or sets, the app crashes with InputMismatchException.
+   Fix: Wrap each numeric input in a loop that catches InputMismatchException and re-prompts the user. Something like "Invalid input, please enter a number."
+
+2) "WORKOUT ADDED!" PRINTS BEFORE VALIDATION
+   File: WorkoutApp.java (line 74)
+   Problem: We print "Workout added!" right after creating the Workout, but we never validate the date, weight, reps, or sets at that point. Invalid workouts get silently skipped later during save. Professor specifically flagged this.
+   Fix: Validate all fields BEFORE adding to the log. Only print "Workout added!" if everything passes. If something is wrong, tell the user what and re-prompt.
+
+3) DATE FORMAT IS CONFUSING
+   File: WorkoutApp.java (line 46) prompts "Enter date (MM/DD/YR):"
+   File: FileStorage.java isValidDate() method (line 359-378) accepts multiple formats
+   Problem: The prompt says MM/DD/YR but the validator accepts different formats. Users get confused because their date works at input time but might get rejected on save.
+   Fix: Pick ONE date format (MM/DD/YYYY or MM/DD/YY) and enforce it at input time. Update the prompt to match exactly what we accept.
+
+4) NO USER CLASS
+   Problem: Our TP01 proposal said we would have a User class. It does not exist anywhere in the project.
+   Fix: Create a User.java class. Minimum it should hold a username/name. The app should ask "Enter your name" on startup and tie the log to that user. Does not need to be complicated.
+
+5) STARTUP FLOW - NO CREATE/LOAD OPTION
+   Problem: The app just auto-loads from workouts.csv on startup. Professor wants explicit options.
+   Fix: On startup, ask user:
+     1. Create a new workout log
+     2. Load an existing workout log
+   Option 1 starts fresh (empty log). Option 2 loads from the CSV file.
+
+
+NEW FEATURES (Required Extensions for TP03)
+--------------------------------------------
+
+6) EDIT WORKOUT
+   WorkoutLog already has getWorkout() method. We need to:
+   - Add menu option "Edit Workout"
+   - Show the list with index numbers (listAllWorkouts already does this)
+   - Let user pick an index
+   - Let user change any field (date, exercise, weight, reps, sets, note, completed)
+   - Need setter methods on Workout.java (we only have setCompleted right now, need setDate, setExercise, setWeight, setReps, setSets, setNote)
+
+7) DELETE WORKOUT
+   WorkoutLog already has removeWorkout() method. We just need to:
+   - Add menu option "Delete Workout"
+   - Show the list with index numbers
+   - Let user pick which one to delete
+   - Confirm before deleting
+
+8) SEARCH/FILTER WORKOUTS BY DATE
+   We need to:
+   - Add menu option "Search Workouts"
+   - Ask user for a date to search
+   - Loop through all workouts and display only ones matching that date
+   - Display "No workouts found for that date" if none match
+
+
+TP03 REPORT
+-----------
+
+9) SUBMIT TP03 REPORT
+   We missed TP02 report entirely. For TP03 we need a document that includes:
+   - Changes made since TP02
+   - Which feedback items from professor were fixed
+   - Team member contributions (who did what)
+   - Screenshots or output proving it works
+
+
+WHO DOES WHAT (suggested split)
+-------------------------------
+
+[Teammate 1]:
+- Fix input validation crashes (#1)
+- Fix "Workout added!" premature message (#2)
+- Fix date prompt/validation mismatch (#3)
+
+[Teammate 2]:
+- Create User class (#4)
+- Improve startup flow with create/load option (#5)
+- Write the TP03 report (#9)
+
+[Teammate 3]:
+- Add Edit Workout feature (#6) - includes adding setter methods to Workout.java
+- Add Delete Workout feature (#7)
+- Add Search/Filter by date feature (#8)
+
+NOTE: The role split above is just a suggestion. Rearrange as needed based on everyones availability. But all 9 items need to be done before TP03 is due.
+
+
+EXTRA ITEMS TO HIT "EXCEEDS STANDARD" (100%)
+----------------------------------------------
+
+These are not called out by the professor directly, but the rubric says "Exceeds Standard" requires handling BOTH valid AND invalid user requirements with meaningful messages. If we skip these, we land at "At Standard" (31-36 pts per category) instead of "Exceeds" (37-40).
+
+10) REJECT NEGATIVE/ZERO VALUES FOR WEIGHT, REPS, SETS
+    Problem: Right now even if we fix the crash on letters, someone could type -5 for weight or 0 for reps and it would go through.
+    Fix: After parsing the number, check that weight > 0, reps > 0, sets > 0. Re-prompt if not. Print something like "Weight must be a positive number."
+
+11) UPGRADE COMMENTS AND DOCUMENTATION (20 pts on rubric)
+    Problem: Current comments are very basic, like "// Get date" next to every line. Professor wants comments that explain WHAT the code does and WHY, not just restating the line.
+    Fix: Each file should have a class-level Javadoc comment explaining the purpose of the class. Methods should have a brief description of what they do. Remove low-value comments like "// Set date" and replace with meaningful ones explaining logic. This is 20% of the grade so dont skip it.
+
+12) UPDATE FileStorageTest TO COVER NEW FEATURES
+    Problem: Our tests only cover save/load right now. If we add edit, delete, search and the professor runs them, the new features wont be tested.
+    Fix: Add test cases for editing a workout, deleting a workout, and searching by date. Also add a test case that checks the credit validation on negative numbers. Shows the professor we actually tested everything.
+
+13) UPDATED MENU SHOULD SHOW ALL OPTIONS CLEARLY
+    Current menu only has 3 options. After all the fixes, the new menu should look like:
+      1. Add Workout
+      2. View Workouts
+      3. Edit Workout
+      4. Delete Workout
+      5. Search Workouts by Date
+      6. Exit
+    Make sure the menu is clean and numbered. The default case should print "Invalid choice, please try again." for any number outside 1-6.
+
+
+CURRENT CODE STATUS (what already works)
+-----------------------------------------
+
+- WorkoutLog.java has removeWorkout() and getWorkout() already built (just not hooked up to menu)
+- FileStorage.java is solid - save, load, backup, CSV parsing all work
+- FileStorageTest.java tests pass for normal cases
+- Viewing workouts works fine
+- The structure is clean (WorkoutApp, WorkoutLog, Workout, FileStorage)
+
+The main gap is the user-facing app layer. The backend/storage is good but the menu and input handling need the most work.
+
+Total items: 13 (9 required + 4 to guarantee top marks)
