@@ -172,4 +172,40 @@ public class WorkoutLog {
         }
         return results; // Return list of found workouts
     }
+
+    // Search workouts by date and return matching workouts
+    // This method supports the TP03 requirement to filter workouts by date
+    public List<Workout> searchByDate(String date) {
+
+        List<Workout> results = new ArrayList<>(); // List to store matching workouts
+
+        for (Workout workout : workoutList) { // Loop through all workouts
+            if (workout != null && workout.getDate().equals(date)) { // Check if workout date matches
+                results.add(workout); // Add matching workout to results list
+            }
+        }
+
+        return results; // Return list of matching workouts
+    }
+
+    // Edit a workout's details
+    public void editWorkout(int workoutIndex, String exercise, double weight, int reps, int sets, String note) {
+
+        if (workoutIndex >= 0 && workoutIndex < workoutList.size()) { // Check index is valid
+
+            Workout workout = workoutList.get(workoutIndex); // Get the workout
+
+            workout.setExercise(exercise); // Update exercise
+            workout.setWeight(weight); // Update weight
+            workout.setReps(reps); // Update reps
+            workout.setSets(sets); // Update sets
+            workout.setNote(note); // Update notes
+
+            System.out.println("Workout updated successfully.");
+
+        } else {
+            System.out.println("Invalid workout index.");
+        }
+    }
+
 }

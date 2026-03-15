@@ -56,6 +56,33 @@ public class Workout { // Represents one workout entry
         this.completed = completed;
     }
 
+    // Update exercise name
+    public void setExercise(String exercise) {
+        this.exercise = exercise;
+    }
+
+    // Update weight
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    // Update reps
+    public void setReps(int reps) {
+        this.reps = reps;
+    }
+
+    // Update sets
+    public void setSets(int sets) {
+        this.sets = sets;
+    }
+
+    // Update notes
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+
+
     public String toString() { // Print workout nicely
         return "Date: " + date +
                 ", Exercise: " + exercise +
