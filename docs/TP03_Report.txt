@@ -1,8 +1,8 @@
-TP03: Team Project Progress Report
-====================================
+TP03: Team Project Final Report
+================================
 Project: Workout Log (Java)
 Course: CS132 Computer Science I
-Date: March 8, 2026
+Date: March 17, 2026
 
 Team Members:
 - Mark Varkevisser
@@ -14,106 +14,138 @@ Team Members:
 1. PROJECT OVERVIEW
 -------------------
 
-The Workout Log is a console-based Java application that allows users to track their workouts, save progress to a CSV file, and reload workout history on startup. The project uses a clean separation of concerns with dedicated classes for the data model (Workout), in-memory management (WorkoutLog), user interface (WorkoutApp), and persistent storage (FileStorage).
+Workout Log is a console-based Java application for creating, viewing, editing, deleting,
+searching, and persisting workout entries. The codebase maintains clear separation of concerns:
+
+- Workout.java      : Data model with getters/setters and CSV conversion helpers
+- WorkoutLog.java   : In-memory workout list management (add, remove, edit, search)
+- WorkoutApp.java   : CLI menu, input validation, and application flow
+- FileStorage.java  : CSV save/load, validation, backup rotation, and thread-safe file I/O
+- User.java         : Simple user identity class (username)
 
 
-2. CHANGES MADE SINCE TP02
---------------------------
+2. CHANGES COMPLETED SINCE TP02
+-------------------------------
 
-The following changes and improvements have been identified and are being implemented for TP03:
+All required and exceeds-standard TP03 items have been completed.
 
-Bug Fixes:
-- Input validation: Wrapping all numeric inputs (menu choice, weight, reps, sets) in try-catch blocks with re-prompting to prevent crashes on non-numeric input
-- Premature success message: Moving the "Workout added!" confirmation to only print after all fields are validated, not before
-- Date format mismatch: Standardizing both the prompt and the validator to accept a single date format (MM/DD/YYYY) instead of multiple conflicting formats
+Bug Fixes (Required):
+- Robust numeric input handling prevents InputMismatchException crashes
+- "Workout added!" now prints only after full field validation passes
+- Date input/validation standardized to single format: MM/DD/YYYY
 
-New Features Added:
-- User class: Implementing User.java to capture the user's name on startup, fulfilling the original TP01 proposal
-- Startup flow: Adding a create/load option at startup so users can choose to start fresh or load existing workout history
-- Edit workout: Adding menu option and setter methods to allow modification of existing workout entries
-- Delete workout: Hooking up the existing removeWorkout() method to a new menu option with confirmation prompt
-- Search/filter by date: Adding a menu option to search and display workouts matching a specific date
-- Negative value rejection: Validating that weight, reps, and sets are positive numbers before accepting
+New Features (Required):
+- User class added; app prompts for username on startup
+- Startup flow offers explicit Create New / Load Existing choice
+- Edit Workout: update any field (date, exercise, weight, reps, sets, note, completed)
+- Delete Workout: confirmation prompt before removal
+- Search Workouts by Date: displays matching entries or "No workouts found"
 
-Documentation Improvements:
-- Upgraded all comments from basic line-level comments to meaningful Javadoc-style class and method documentation
-- Updated FileStorageTest to cover new edit, delete, and search functionality
+Exceeds-Standard Enhancements:
+- Positive-value enforcement: weight, reps, sets must be > 0
+- Javadoc/comment quality pass on all core classes
+- FileStorageTest expanded with edit/delete/search and validation coverage
+- Menu updated to clean 1-6 numbered options with invalid-choice handling
 
 
 3. PROFESSOR FEEDBACK ADDRESSED
---------------------------------
+-------------------------------
 
 Feedback Item                              | Status
--------------------------------------------|------------------
-App crashes on non-numeric input           | Being fixed
-"Workout added!" prints before validation  | Being fixed
-Date prompt/validation mismatch            | Being fixed
-Missing User class from TP01 design        | Being added
-No create/load option at startup           | Being added
-Missing TP02 report                        | Acknowledged (this TP03 report covers all progress)
-Edit workout feature                       | Being added
-Delete workout feature                     | Being added
-Search/filter by date                      | Being added
+-------------------------------------------|----------
+App crashes on non-numeric input           | FIXED
+"Workout added!" prints before validation  | FIXED
+Date prompt/validation mismatch            | FIXED
+Missing User class from TP01 design        | ADDED
+No create/load option at startup           | ADDED
+Missing TP02 report                        | COVERED (this report)
+Edit workout feature                       | ADDED
+Delete workout feature                     | ADDED
+Search/filter by date                      | ADDED
 
 
 4. TEAM CONTRIBUTIONS
 ---------------------
 
 Mark Varkevisser:
-- Built the FileStorage layer (save, load, backup, CSV parsing, validation, locking)
-- Created FileStorageTest for integration testing
-- Wrote the README with full project documentation
-- Integrated FileStorage with typed Workout object persistence
+- Built FileStorage layer (save, load, backup, CSV parsing, validation, locking)
+- Created and expanded FileStorageTest for integration testing
+- Wrote README with full project documentation
+- Integrated FileStorage with typed Workout persistence
+- Completed TP03 input validation, edit/delete/search menu flow, and Javadoc polish
 
 Tuan Phan:
-- Created the initial project structure (Workout.java, WorkoutApp.java)
-- Integrated WorkoutLog into WorkoutApp with the menu loop
-- Set up the GitHub repository
+- Created initial project structure (Workout.java, WorkoutApp.java)
+- Integrated WorkoutLog into WorkoutApp with menu loop
+- Set up GitHub repository
+- Added User class and startup username prompt
 
 Peterson Magadia:
-- Implemented the WorkoutLog class for in-memory workout management
+- Implemented WorkoutLog class for in-memory workout management
 - Submitted pull request with WorkoutLog integration
 
 Jazmin Mercado:
-- (Contributions to be updated as TP03 work is completed)
+- Assisted with testing and verification
+- Reviewed code changes and provided feedback
 
-(TP03 code changes are being split among all team members per the task breakdown document)
 
+5. FINAL APPLICATION STATE
+--------------------------
 
-5. CURRENT APPLICATION STATE
-----------------------------
+All features are implemented and verified:
 
-What works:
-- Adding workout entries via CLI menu
-- Viewing all stored workouts
-- Saving workout data to CSV on exit
-- Loading existing workout history on startup
-- CSV-safe parsing with support for commas and quotes
+- Add workout with full input validation (date format, positive numbers)
+- View all workouts with indexed list
+- Edit any workout field
+- Delete workout with confirmation
+- Search workouts by date
+- Save workouts to CSV on exit
+- Load workouts from CSV on startup (if user chooses Load Existing)
+- CSV-safe parsing with quoted field support
 - Automatic backup creation and rotation
 - Thread-safe file operations
 
-What is being improved:
-- Input validation and error handling across the entire UI layer
-- Adding User class for user identification
-- Adding edit, delete, and search functionality
-- Upgrading comments and documentation quality
+
+6. VERIFICATION EVIDENCE
+------------------------
+
+Compile:
+  javac -d target\classes src\main\java\com\mycompany\app\*.java
+  Result: No errors
+
+Unit/Integration Tests:
+  java -cp target\classes com.mycompany.app.FileStorageTest
+  Result: "All FileStorage tests passed."
+
+Manual App Run:
+  Verified startup flow, add, edit, delete, search, and exit save behavior.
+  Transcript saved to: docs/manual_run_transcript.txt
+
+Checklist:
+  docs/manual_run_checklist.md
 
 
-6. PROJECT STRUCTURE
+7. PROJECT STRUCTURE
 --------------------
 
 Workout_java/
   pom.xml
   README.md
+  docs/
+    TP03_Report.txt           - This report
+    whatsneededonourside.txt  - TP03 checklist with completion status
+    manual_run_checklist.md   - Manual verification checklist
+    manual_run_transcript.txt - Terminal output proof
   src/main/java/com/mycompany/app/
-    WorkoutApp.java    - Main menu and application flow
-    WorkoutLog.java    - In-memory list manager for workouts
-    Workout.java       - Workout data model and CSV helpers
-    FileStorage.java   - Save/load, validation, backups, locking
-    FileStorageTest.java - Integration tests for storage
+    WorkoutApp.java           - Main menu and application flow
+    WorkoutLog.java           - In-memory list manager for workouts
+    Workout.java              - Workout data model and CSV helpers
+    FileStorage.java          - Save/load, validation, backups, locking
+    FileStorageTest.java      - Integration tests for storage
+    User.java                 - User identity class
 
 
-7. HOW TO COMPILE AND RUN
+8. HOW TO COMPILE AND RUN
 -------------------------
 
 Compile:
