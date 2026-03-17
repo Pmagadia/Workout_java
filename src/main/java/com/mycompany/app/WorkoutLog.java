@@ -188,24 +188,42 @@ public class WorkoutLog {
         return results; // Return list of matching workouts
     }
 
-    // Edit a workout's details
-    public void editWorkout(int workoutIndex, String exercise, double weight, int reps, int sets, String note) {
+    // Edit a workout's details and return true when update succeeds.
+    public boolean editWorkout(
+            int workoutIndex,
+            String date,
+            String exercise,
+            double weight,
+            int reps,
+            int sets,
+            String note,
+            boolean completed) {
 
-        if (workoutIndex >= 0 && workoutIndex < workoutList.size()) { // Check index is valid
+        if (workoutList.isEmpty()) {
+            System.out.println("No workouts available to edit.");
+            return false;
+        }
 
-            Workout workout = workoutList.get(workoutIndex); // Get the workout
+        if (workoutIndex >= 0 && workoutIndex < workoutList.size()) {
+            Workout workout = workoutList.get(workoutIndex);
+            if (workout == null) {
+                System.out.println("Workout entry is invalid.");
+                return false;
+            }
 
-            workout.setExercise(exercise); // Update exercise
-            workout.setWeight(weight); // Update weight
-            workout.setReps(reps); // Update reps
-            workout.setSets(sets); // Update sets
-            workout.setNote(note); // Update notes
+            workout.setDate(date);
+            workout.setExercise(exercise);
+            workout.setWeight(weight);
+            workout.setReps(reps);
+            workout.setSets(sets);
+            workout.setNote(note);
+            workout.setCompleted(completed);
 
             System.out.println("Workout updated successfully.");
-
-        } else {
-            System.out.println("Invalid workout index.");
+            return true;
         }
-    }
 
+        System.out.println("Invalid workout index.");
+        return false;
+    }
 }

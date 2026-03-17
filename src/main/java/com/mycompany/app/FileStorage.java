@@ -292,7 +292,7 @@ public class FileStorage {
             double weight = Double.parseDouble(parts.get(2).trim());
             int reps = Integer.parseInt(parts.get(3).trim());
             int sets = Integer.parseInt(parts.get(4).trim());
-            if (weight < 0 || reps < 0 || sets < 0) {
+            if (weight <= 0 || reps <= 0 || sets <= 0) {
                 return false;
             }
         } catch (NumberFormatException e) {

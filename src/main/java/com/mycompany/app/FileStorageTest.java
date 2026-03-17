@@ -14,6 +14,8 @@ public class FileStorageTest {
         testInvalidRowsSkipped();
         testBackupCreation();
         testQuotedCsvHandling();
+        testWorkoutLogEditDeleteAndSearchByDate();
+        testStrictPositiveValueValidation();
         System.out.println("All FileStorage tests passed.");
     }
 
@@ -26,7 +28,7 @@ public class FileStorageTest {
 
         List<Workout> workouts = List.of(
                 new Workout("2/21/2026", "Bench Press", 135.0, 10, 3, "Strong session", true),
-                new Workout("2/22/2026", "Pull Ups", 0.0, 12, 3, "Bodyweight", false)
+                new Workout("2/22/2026", "Pull Ups", 1.0, 12, 3, "Bodyweight", false)
         );
 
         assertTrue(storage.saveWorkoutObjects(workouts, filePath), "Typed save should succeed");
@@ -96,6 +98,46 @@ public class FileStorageTest {
 
         assertEquals(1, loaded.size(), "Quoted CSV should round-trip with one row");
         assertEquals("Felt \"great\", strong form", loaded.get(0).getNote(), "Quoted/comma notes should be preserved");
+    }
+
+    private static void testWorkoutLogEditDeleteAndSearchByDate() {
+        WorkoutLog log = new WorkoutLog();
+        Workout workout = new Workout("03/17/2026", "Bench Press", 135.0, 10, 3, "Initial", false);
+        log.addWorkout(workout);
+
+        boolean edited = log.editWorkout(
+                0,
+                "03/18/2026",
+                "Incline Bench",
+                145.0,
+                8,
+                4,
+                "Updated",
+                true);
+
+        assertTrue(edited, "Edit should return true for valid index");
+        Workout updated = log.getWorkout(0);
+        assertEquals("03/18/2026", updated.getDate(), "Edited date should persist");
+        assertEquals("Incline Bench", updated.getExercise(), "Edited exercise should persist");
+
+        List<Workout> byDate = log.searchByDate("03/18/2026");
+        assertEquals(1, byDate.size(), "Search by date should find edited workout");
+
+        log.removeWorkout(0);
+        assertEquals(0, log.getTotalWorkouts(), "Delete should remove workout");
+    }
+
+    private static void testStrictPositiveValueValidation() {
+        FileStorage storage = new FileStorage();
+
+        assertTrue(!storage.isValidWorkoutEntry("03/17/2026,Squat,0,8,3,Zero weight,false"),
+                "Weight must be > 0");
+        assertTrue(!storage.isValidWorkoutEntry("03/17/2026,Squat,185,0,3,Zero reps,false"),
+                "Reps must be > 0");
+        assertTrue(!storage.isValidWorkoutEntry("03/17/2026,Squat,185,8,0,Zero sets,false"),
+                "Sets must be > 0");
+        assertTrue(!storage.isValidWorkoutEntry("03/17/2026,Squat,-5,8,3,Negative weight,false"),
+                "Negative weight must be rejected");
     }
 
     private static void assertTrue(boolean condition, String message) {

@@ -1,0 +1,72 @@
+=== Compile ===
+
+=== FileStorageTest ===
+[FileStorage 14:13:06] Saved 2 workouts to C:\Users\markv\AppData\Local\Temp\workout-storage-roundtrip-16021153331917872698\workouts_roundtrip.csv (skipped 0)
+[FileStorage 14:13:06] Loaded 2 workouts from C:\Users\markv\AppData\Local\Temp\workout-storage-roundtrip-16021153331917872698\workouts_roundtrip.csv (skipped 0)
+[FileStorage 14:13:06] Loaded 1 workouts from C:\Users\markv\AppData\Local\Temp\workout-storage-invalid-7613892039224304827\workouts_invalid.csv (skipped 2)
+[FileStorage 14:13:06] Saved 1 workouts to C:\Users\markv\AppData\Local\Temp\workout-storage-backup-14580108894195572138\workouts_backup_542345491149500.csv (skipped 0)
+[FileStorage 14:13:06] Saved 1 workouts to C:\Users\markv\AppData\Local\Temp\workout-storage-backup-14580108894195572138\workouts_backup_542345491149500.csv (skipped 0)
+[FileStorage 14:13:06] Saved 1 workouts to C:\Users\markv\AppData\Local\Temp\workout-storage-csv-14424645519138006419\workouts_quoted.csv (skipped 0)
+[FileStorage 14:13:06] Loaded 1 workouts from C:\Users\markv\AppData\Local\Temp\workout-storage-csv-14424645519138006419\workouts_quoted.csv (skipped 0)
+Workout updated successfully.
+Workout removed.
+All FileStorage tests passed.
+
+=== Manual Run: Create New + Add + Edit + Delete + Exit ===
+Enter username: Welcome, Tester!
+Startup: 1) Create a new workout log  2) Load existing workout log
+Choose an option: Starting a new empty workout log.
+1. Add Workout
+2. View Workouts
+3. Edit Workout
+4. Delete Workout
+5. Search Workouts by Date
+6. Exit
+Choose an option: Enter date (MM/DD/YYYY): Enter exercise name: Enter weight used: Enter reps: Enter number of sets: Any notes? Mark as completed? (y/n): Workout added!
+1. Add Workout
+2. View Workouts
+3. Edit Workout
+4. Delete Workout
+5. Search Workouts by Date
+6. Exit
+Choose an option: [0] Date: 03/21/2026, Exercise: Bench Press, Weight: 135.0, Reps: 10, Sets: 3, Note: Solid day, Completed: true
+Enter workout index to edit: Enter new date (MM/DD/YYYY): Enter new exercise name: Enter new weight: Enter new reps: Enter new sets: Enter new notes: Mark as completed? (y/n): Workout updated successfully.
+1. Add Workout
+2. View Workouts
+3. Edit Workout
+4. Delete Workout
+5. Search Workouts by Date
+6. Exit
+Choose an option: [0] Date: 03/22/2026, Exercise: Incline Bench, Weight: 145.0, Reps: 8, Sets: 4, Note: Edited note, Completed: false
+Enter workout index to delete: Are you sure you want to delete this workout? (y/n): Workout removed.
+1. Add Workout
+2. View Workouts
+3. Edit Workout
+4. Delete Workout
+5. Search Workouts by Date
+6. Exit
+Choose an option: [FileStorage 14:13:07] Saved 0 workouts to data\workouts.csv (skipped 0)
+Workouts saved successfully.
+Exiting program...
+
+=== Manual Run: Load Existing + View + Exit ===
+Enter username: Welcome, Tester!
+Startup: 1) Create a new workout log  2) Load existing workout log
+Choose an option: [FileStorage 14:13:07] Loaded 0 workouts from data\workouts.csv (skipped 0)
+1. Add Workout
+2. View Workouts
+3. Edit Workout
+4. Delete Workout
+5. Search Workouts by Date
+6. Exit
+Choose an option: No workouts in the log.
+1. Add Workout
+2. View Workouts
+3. Edit Workout
+4. Delete Workout
+5. Search Workouts by Date
+6. Exit
+Choose an option: [FileStorage 14:13:07] Saved 0 workouts to data\workouts.csv (skipped 0)
+Workouts saved successfully.
+Exiting program...
+

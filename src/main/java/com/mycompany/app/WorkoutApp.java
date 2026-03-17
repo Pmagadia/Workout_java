@@ -1,16 +1,33 @@
 package com.mycompany.app; // Package name
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.List;
 import java.util.Scanner; // Allows user input
 
+/**
+ * Console entry point for the Workout application.
+ *
+ * <p>Coordinates user interaction, input validation, and save/load behavior
+ * through {@link WorkoutLog} and {@link FileStorage}.</p>
+ */
 public class WorkoutApp { // Main application class
 
+    private static final DateTimeFormatter INPUT_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MM/dd/uuuu").withResolverStyle(ResolverStyle.STRICT);
+
+    private static final String DATE_PROMPT_TEXT = "Enter date (MM/DD/YYYY): ";
+
+    /**
+     * Starts the interactive CLI loop.
+     */
     public static void main(String[] args) { // Program starts here
 
         Scanner sc = new Scanner(System.in); // Create Scanner object
 
-        System.out.print("Enter username: "); // Ask user for their name
-        String username = sc.nextLine(); // Read username input
+        String username = readNonEmptyText(sc, "Enter username: ");
 
         User user = new User(username); // Create User object
 
@@ -19,17 +36,26 @@ public class WorkoutApp { // Main application class
         WorkoutLog log = new WorkoutLog();   // Create WorkoutLog to store workouts
         FileStorage storage = new FileStorage();
 
-        // Load existing workout history from file when app starts.
-        try {
-            List<Workout> loadedWorkouts = storage.loadWorkoutObjects();
-            for (Workout workout : loadedWorkouts) {
-                log.addWorkout(workout);
+        int startupChoice = readIntInRange(
+                sc,
+                "Startup: 1) Create a new workout log  2) Load existing workout log\nChoose an option: ",
+                1,
+                2);
+
+        if (startupChoice == 2) {
+            try {
+                List<Workout> loadedWorkouts = storage.loadWorkoutObjects();
+                for (Workout workout : loadedWorkouts) {
+                    log.addWorkout(workout);
+                }
+                if (!loadedWorkouts.isEmpty()) {
+                    System.out.println("Loaded " + loadedWorkouts.size() + " workout(s) from storage.");
+                }
+            } catch (FileStorage.FileStorageException e) {
+                System.out.println("Could not load saved workouts: " + e.getMessage());
             }
-            if (!loadedWorkouts.isEmpty()) {
-                System.out.println("Loaded " + loadedWorkouts.size() + " workout(s) from storage.");
-            }
-        } catch (FileStorage.FileStorageException e) {
-            System.out.println("Could not load saved workouts: " + e.getMessage());
+        } else {
+            System.out.println("Starting a new empty workout log.");
         }
 
         boolean running = true; // Controls the menu loop
@@ -39,87 +65,17 @@ public class WorkoutApp { // Main application class
             // Display menu options
             System.out.println("1. Add Workout");
             System.out.println("2. View Workouts");
-            System.out.println("3. Delete Workout");
-            System.out.println("4. Mark Workout Completed");
-            System.out.println("5. Edit Workout");
-            System.out.println("6. Search Workout by Exercise");
-            System.out.println("7. Search Workout by Date");
-            System.out.println("8. Exit");
-            System.out.print("Choose an option: ");
+            System.out.println("3. Edit Workout");
+            System.out.println("4. Delete Workout");
+            System.out.println("5. Search Workouts by Date");
+            System.out.println("6. Exit");
 
-            int choice; // Variable to store user menu choice
-
-            try {
-                choice = sc.nextInt(); // Try reading a number from the user
-            } catch (Exception e) { // If user enters something that is not a number
-                System.out.println("Invalid input. Please enter a number."); // Show error message
-                sc.nextLine(); // Clear the invalid input from scanner
-                continue; // Restart the menu loop
-            }
-
-            sc.nextLine(); // Clear leftover newline character
+            int choice = readIntInRange(sc, "Choose an option: ", 1, 6);
 
             switch (choice) { // Check which option user selected
 
                 case 1: // Add a workout
-
-                    System.out.print("Enter date (MM/DD/YR): ");
-                    String date = sc.nextLine(); // Get date
-                    // Validate date format to ensure it follows MM/DD/YY
-                    if (!date.matches("\\d{2}/\\d{2}/\\d{2}")) { // Check if date matches pattern
-                        System.out.println("Invalid date format. Please use MM/DD/YY."); // Show error message
-                        break; // Return to menu without adding workout
-                    }
-
-                    System.out.print("Enter exercise name: ");
-                    String exercise = sc.nextLine(); // Get exercise name
-
-                    double weight; // Variable to store workout weight
-
-                    try {
-                        System.out.print("Enter weight used: "); // Ask user for weight
-                        weight = sc.nextDouble(); // Try reading a decimal number
-                    } catch (Exception e) { // If user types letters or invalid input
-                        System.out.println("Invalid weight input."); // Show error message
-                        sc.nextLine(); // Clear invalid input
-                        break; // Exit this case and return to menu
-                    }
-
-                    int reps; // Variable to store number of reps
-
-                    try {
-                        System.out.print("Enter reps: "); // Ask user for reps
-                        reps = sc.nextInt(); // Try reading an integer
-                    } catch (Exception e) { // If input is not a number
-                        System.out.println("Invalid reps input."); // Show error message
-                        sc.nextLine(); // Clear invalid input
-                        break; // Return to menu
-                    }
-
-                    int sets; // Variable to store number of sets
-
-                    try {
-                        System.out.print("Enter number of sets: "); // Ask user for sets
-                        sets = sc.nextInt(); // Try reading integer
-                        sc.nextLine(); // Clear leftover newline before reading text input
-                    } catch (Exception e) { // If user enters invalid input
-                        System.out.println("Invalid sets input."); // Show error message
-                        sc.nextLine(); // Clear invalid input
-                        break; // Return to menu
-                    }
-
-                    System.out.print("Any notes? ");
-                    String note = sc.nextLine(); // Get notes
-
-                    System.out.print("Mark as completed? (y/n): ");
-                    boolean completed = sc.nextLine().equalsIgnoreCase("y"); // Convert to true/false
-
-                    // Create Workout object
-                    Workout workout = new Workout(date, exercise, weight, reps, sets, note, completed);
-
-                    log.addWorkout(workout); // Add workout to the log
-
-                    System.out.println("Workout added!"); // Confirmation message
+                    addWorkout(sc, log);
                     break; // End case 1
 
                 case 2: // View workouts
@@ -127,93 +83,19 @@ public class WorkoutApp { // Main application class
                     log.listAllWorkouts(); // Show all stored workouts
                     break; // End case 2
 
-                case 3: // Delete workout
-
-                    log.listAllWorkouts();
-
-                    System.out.print("Enter workout index to delete: ");
-                    int deleteIndex = sc.nextInt();
-                    sc.nextLine();
-
-                    log.removeWorkout(deleteIndex);
-
+                case 3: // Edit workout
+                    editWorkout(sc, log);
                     break;
 
-                case 4: // Mark workout completed
-
-                    log.listAllWorkouts();
-
-                    System.out.print("Enter workout index to mark completed: ");
-                    int completeIndex = sc.nextInt();
-                    sc.nextLine();
-
-                    log.markCompleted(completeIndex);
-
+                case 4: // Delete workout
+                    deleteWorkout(sc, log);
                     break;
 
-                case 5: // Edit workout
-
-                    log.listAllWorkouts(); // Show all workouts
-
-                    System.out.print("Enter workout index to edit: ");
-                    int editIndex = sc.nextInt();
-                    sc.nextLine();
-
-                    System.out.print("Enter new exercise name: ");
-                    String newExercise = sc.nextLine();
-
-                    System.out.print("Enter new weight: ");
-                    double newWeight = sc.nextDouble();
-
-                    System.out.print("Enter new reps: ");
-                    int newReps = sc.nextInt();
-
-                    System.out.print("Enter new sets: ");
-                    int newSets = sc.nextInt();
-                    sc.nextLine();
-
-                    System.out.print("Enter new notes: ");
-                    String newNote = sc.nextLine();
-
-                    log.editWorkout(editIndex, newExercise, newWeight, newReps, newSets, newNote);
-
+                case 5: // Search workouts by date
+                    searchByDate(sc, log);
                     break;
 
-                case 6: // Search workouts
-
-                    System.out.print("Enter exercise name to search: ");
-                    String keyword = sc.nextLine();
-
-                    List<Workout> results = log.searchByExercise(keyword);
-
-                    if (results.isEmpty()) { // Check if no workouts matched
-                        System.out.println("No workouts found for that exercise."); // Inform user
-                    } else {
-                        for (Workout w : results) { // Print each matching workout
-                            System.out.println(w);
-                        }
-                    }
-
-                    break;
-
-                case 7: // Search workouts by date
-
-                    System.out.print("Enter date to search (MM/DD/YY): "); // Ask user for date
-                    String searchDate = sc.nextLine(); // Read date input
-
-                    List<Workout> dateResults = log.searchByDate(searchDate); // Call search method
-
-                    if (dateResults.isEmpty()) { // Check if no workouts matched the date
-                        System.out.println("No workouts found for that date."); // Inform the user
-                    } else {
-                        for (Workout w : dateResults) { // Print each matching workout
-                            System.out.println(w);
-                        }
-                    }
-
-                    break;
-
-                case 8: // Exit program
+                case 6: // Exit program
 
                     // Save all workouts before exiting.
                     try {
@@ -229,14 +111,208 @@ public class WorkoutApp { // Main application class
 
                     running = false; // Stop the loop
                     System.out.println("Exiting program..."); // Exit message
-                    break; // End case 3
+                    break;
 
                 default: // If user enters invalid option
 
-                    System.out.println("Invalid choice."); // Show error message
+                    System.out.println("Invalid choice, please try again.");
             }
         }
 
         sc.close(); // Close Scanner before program ends
+    }
+
+    /**
+     * Collects validated fields and adds a workout to the log.
+     */
+    private static void addWorkout(Scanner sc, WorkoutLog log) {
+
+        String date = readValidatedDate(sc, DATE_PROMPT_TEXT);
+        String exercise = readNonEmptyText(sc, "Enter exercise name: ");
+        double weight = readPositiveDouble(sc, "Enter weight used: ");
+        int reps = readPositiveInt(sc, "Enter reps: ");
+        int sets = readPositiveInt(sc, "Enter number of sets: ");
+        System.out.print("Any notes? ");
+        String note = sc.nextLine();
+        boolean completed = readYesNo(sc, "Mark as completed? (y/n): ");
+
+        Workout workout = new Workout(date, exercise, weight, reps, sets, note, completed);
+        log.addWorkout(workout);
+        System.out.println("Workout added!");
+    }
+
+    /**
+     * Edits a selected workout with full-field updates.
+     */
+    private static void editWorkout(Scanner sc, WorkoutLog log) {
+
+        if (log.getTotalWorkouts() == 0) {
+            System.out.println("No workouts available to edit.");
+            return;
+        }
+
+        log.listAllWorkouts();
+        int editIndex = readIntInRange(sc, "Enter workout index to edit: ", 0, log.getTotalWorkouts() - 1);
+
+        String newDate = readValidatedDate(sc, "Enter new date (MM/DD/YYYY): ");
+        String newExercise = readNonEmptyText(sc, "Enter new exercise name: ");
+        double newWeight = readPositiveDouble(sc, "Enter new weight: ");
+        int newReps = readPositiveInt(sc, "Enter new reps: ");
+        int newSets = readPositiveInt(sc, "Enter new sets: ");
+        System.out.print("Enter new notes: ");
+        String newNote = sc.nextLine();
+        boolean newCompleted = readYesNo(sc, "Mark as completed? (y/n): ");
+
+        log.editWorkout(editIndex, newDate, newExercise, newWeight, newReps, newSets, newNote, newCompleted);
+    }
+
+    /**
+     * Deletes a selected workout after user confirmation.
+     */
+    private static void deleteWorkout(Scanner sc, WorkoutLog log) {
+
+        if (log.getTotalWorkouts() == 0) {
+            System.out.println("No workouts available to delete.");
+            return;
+        }
+
+        log.listAllWorkouts();
+        int deleteIndex = readIntInRange(sc, "Enter workout index to delete: ", 0, log.getTotalWorkouts() - 1);
+        if (readYesNo(sc, "Are you sure you want to delete this workout? (y/n): ")) {
+            log.removeWorkout(deleteIndex);
+        } else {
+            System.out.println("Delete canceled.");
+        }
+    }
+
+    /**
+     * Finds workouts that match the requested date.
+     */
+    private static void searchByDate(Scanner sc, WorkoutLog log) {
+
+        String searchDate = readValidatedDate(sc, "Enter date to search (MM/DD/YYYY): ");
+        List<Workout> dateResults = log.searchByDate(searchDate);
+
+        if (dateResults.isEmpty()) {
+            System.out.println("No workouts found for that date.");
+            return;
+        }
+
+        for (Workout workout : dateResults) {
+            System.out.println(workout);
+        }
+    }
+
+    /**
+     * Reads an integer within [min, max] and keeps prompting until valid.
+     */
+    private static int readIntInRange(Scanner sc, String prompt, int min, int max) {
+
+        while (true) {
+            System.out.print(prompt);
+            String raw = sc.nextLine().trim();
+            try {
+                int value = Integer.parseInt(raw);
+                if (value < min || value > max) {
+                    System.out.println("Please enter a number between " + min + " and " + max + ".");
+                    continue;
+                }
+                return value;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a whole number.");
+            }
+        }
+    }
+
+    /**
+     * Reads a positive integer and keeps prompting until valid.
+     */
+    private static int readPositiveInt(Scanner sc, String prompt) {
+
+        while (true) {
+            System.out.print(prompt);
+            String raw = sc.nextLine().trim();
+            try {
+                int value = Integer.parseInt(raw);
+                if (value <= 0) {
+                    System.out.println("Value must be a positive number.");
+                    continue;
+                }
+                return value;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a whole number.");
+            }
+        }
+    }
+
+    /**
+     * Reads a positive double and keeps prompting until valid.
+     */
+    private static double readPositiveDouble(Scanner sc, String prompt) {
+
+        while (true) {
+            System.out.print(prompt);
+            String raw = sc.nextLine().trim();
+            try {
+                double value = Double.parseDouble(raw);
+                if (value <= 0) {
+                    System.out.println("Value must be a positive number.");
+                    continue;
+                }
+                return value;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+
+    /**
+     * Reads non-empty text input.
+     */
+    private static String readNonEmptyText(Scanner sc, String prompt) {
+
+        while (true) {
+            System.out.print(prompt);
+            String value = sc.nextLine().trim();
+            if (!value.isEmpty()) {
+                return value;
+            }
+            System.out.println("Input cannot be empty.");
+        }
+    }
+
+    /**
+     * Reads and validates date input in strict MM/DD/YYYY format.
+     */
+    private static String readValidatedDate(Scanner sc, String prompt) {
+
+        while (true) {
+            System.out.print(prompt);
+            String raw = sc.nextLine().trim();
+            try {
+                LocalDate parsed = LocalDate.parse(raw, INPUT_DATE_FORMAT);
+                return parsed.format(INPUT_DATE_FORMAT);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use MM/DD/YYYY.");
+            }
+        }
+    }
+
+    /**
+     * Reads yes/no input and returns true for yes.
+     */
+    private static boolean readYesNo(Scanner sc, String prompt) {
+
+        while (true) {
+            System.out.print(prompt);
+            String raw = sc.nextLine().trim().toLowerCase();
+            if ("y".equals(raw) || "yes".equals(raw)) {
+                return true;
+            }
+            if ("n".equals(raw) || "no".equals(raw)) {
+                return false;
+            }
+            System.out.println("Please enter y or n.");
+        }
     }
 }
